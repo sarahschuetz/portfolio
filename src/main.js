@@ -3,10 +3,14 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
+import modifiable from './mixins/modifiable';
+
 Vue.config.productionTip = false;
 
+Vue.mixin(modifiable);
+
 new Vue({
-  router,
-  store,
-  render: h => h(App),
+    router,
+    store,
+    render: h => h(App),
 }).$mount('#app');
