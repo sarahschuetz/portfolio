@@ -1,8 +1,11 @@
+import GoldenFont from '../../components/atoms/goldenText/component.vue';
 
 export default {
     name: 'HomePage',
 
-    components: {},
+    components: {
+        GoldenFont,
+    },
 
     props: {},
 
