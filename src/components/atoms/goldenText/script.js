@@ -1,10 +1,15 @@
 import {
     BoxGeometry,
-    MeshBasicMaterial,
+    MeshStandardMaterial,
     Mesh,
+    FontLoader,
+    TextGeometry,
+    PointLight,
+    PointLightHelper,
 } from 'three';
 
 import webGLCanvas from '../webGLCanvas/component.vue';
+import jsonTypeface from '../../../assets/jsonTypefaces/helvetiker_regular.typeface.json';
 
 export default {
     name: 'GoldenText',
@@ -23,6 +28,14 @@ export default {
     data() {
         return {
             className: 'a-goldenText',
+            mouse: {
+                x: 0,
+                y: 0,
+            },
+            window: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+            },
         };
     },
 
@@ -30,31 +43,56 @@ export default {
 
     watch: {},
 
-    created() {},
+    created() {
+        window.addEventListener('mousemove', this.trackMouse);
+    },
 
     mounted() {
         const canvas = this.$refs.webGLCanvas;
-        console.log(canvas);
         const geometry = new BoxGeometry(1, 1, 1);
-        const material = new MeshBasicMaterial({ color: 0x00ff00 });
-        this.cube = new Mesh(geometry, material);
-        canvas.addToScene(this.cube);
+        const goldMaterial = new MeshStandardMaterial({
+            color: 0xffd700,
+            // shininess: 150,
+            roughness: 0.3,
+            metalness: 0.7,
+        });
+        this.cube = new Mesh(geometry, goldMaterial);
+        // canvas.scene.add(this.cube);
 
-        // const loader = new THREE.FontLoader();
-        // loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
-        //     const geo = new THREE.TextGeometry( 'Hello three.js!', {
-        //         font: font,
-        //         size: 80,
-        //         height: 5,
-        //         curveSegments: 12,
-        //         bevelEnabled: true,
-        //         bevelThickness: 10,
-        //         bevelSize: 8,
-        //         bevelOffset: 0,
-        //         bevelSegments: 5
-        //     } );
-        //     scene.add(new THREE.Mesh(geo, material));
-        // } );
+        const fontLoader = new FontLoader();
+        const font = fontLoader.parse(jsonTypeface);
+        const textGeometry = new TextGeometry('Hello three.js!', {
+            font,
+            size: 100,
+            height: 1,
+            curveSegments: 12,
+            bevelEnabled: false,
+            bevelThickness: 10,
+            bevelSize: 8,
+            bevelOffset: 0,
+            bevelSegments: 3,
+        });
+
+        const textMesh = new Mesh(textGeometry, goldMaterial);
+        canvas.scene.add(textMesh);
+        // canvas.camera.position.x = window.innerWidth / 2;
+        canvas.camera.position.x = 0;
+        canvas.camera.position.y = 0;
+        canvas.camera.position.z = 1000;
+        canvas.camera.lookAt(textMesh.position);
+        console.log('added mesh to scene');
+
+        const color = 0xFFFFFF;
+        const intensity = 1;
+        this.light = new PointLight(color, intensity);
+        canvas.scene.add(this.light);
+
+        const helper = new PointLightHelper(this.light);
+        canvas.scene.add(helper);
+    },
+
+    destroyed() {
+        window.removeEventListener('mousemove', this.trackMouse);
     },
 
     methods: {
@@ -62,7 +100,17 @@ export default {
             if (this.cube) {
                 this.cube.rotation.x += 0.01;
                 this.cube.rotation.y += 0.01;
+                this.light.position.set(
+                    this.mouse.x - this.window.width / 2,
+                    this.mouse.y - this.window.height / 2,
+                    70,
+                );
             }
+        },
+        trackMouse(evt) {
+            this.mouse.x = evt.clientX;
+            this.mouse.y = evt.clientY;
+            console.log('mouse', this.mouse.x, this.mouse.y);
         },
     },
 };

@@ -40,8 +40,6 @@ export default {
     mounted() {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.$refs.componentRoot.appendChild(this.renderer.domElement);
-
-        this.camera.position.z = 5;
         this.render();
     },
 
