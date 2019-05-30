@@ -1,7 +1,5 @@
 <template>
-  <div :class="rootClass">
-    <webGLCanvas :render-function="render" ref="webGLCanvas" />
-  </div>
+  <div :class="rootClass" ref="componentRoot" />
 </template>
 
 <script src="./script.js"></script>
